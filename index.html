@@ -99,13 +99,15 @@
   /* Signature overlay (full screen landscape) */
   #sigOverlay{position:fixed;inset:0;z-index:200;background:#0b1f3a;display:none;flex-direction:column}
   #sigOverlay.on{display:flex}
-  #sigOverlay .bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;color:#fff}
-  #sigOverlay .bar b{font-size:14px}
-  #sigOverlay .hint{color:#bcd3f2;font-size:12px}
+  #sigOverlay .bar{display:flex;align-items:center;gap:10px;padding:8px 12px;color:#fff;flex-wrap:wrap}
+  #sigOverlay .bar b{font-size:14px;white-space:nowrap}
+  #sigOverlay .hint{color:#bcd3f2;font-size:11px}
+  #sigOverlay .sigbtns{display:flex;gap:8px;margin-left:auto}
+  #sigOverlay .sigbtns button{border:none;border-radius:9px;font-weight:700;font-size:14px;padding:10px 15px;cursor:pointer}
+  #sigOverlay .sigbtns .save{background:#19b36b;color:#fff}
+  #sigOverlay .sigbtns .clear{background:#1b3a66;color:#cfe0f6}
+  #sigOverlay .sigbtns .cancel{background:#3a4a63;color:#dfe7f3}
   #sigCanvas{flex:1;width:100%;background:#fff;touch-action:none;display:block}
-  #sigOverlay .acts{display:flex;gap:10px;padding:12px 14px;padding-bottom:max(12px,env(safe-area-inset-bottom))}
-  #sigOverlay .acts .btn{flex:1}
-  #sigOverlay .acts .btn.clear{background:#1b3a66;color:#cfe0f6}
   /* OCR toast */
   #ocrToast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:120;
     background:var(--esm-dark);color:#fff;padding:11px 18px;border-radius:30px;font-size:13.5px;
@@ -247,13 +249,16 @@
 
 <!-- Signature full-screen overlay -->
 <div id="sigOverlay">
-  <div class="bar"><b>Firma del inspector</b><span class="hint">Firma con el dedo · gira el teléfono</span></div>
-  <canvas id="sigCanvas"></canvas>
-  <div class="acts">
-    <button class="btn clear" id="sigClear">Borrar</button>
-    <button class="btn ghost" id="sigCancel" style="background:#1b3a66;color:#cfe0f6">Cancelar</button>
-    <button class="btn primary" id="sigSave">Guardar firma</button>
+  <div class="bar">
+    <b>Firma del inspector</b>
+    <span class="hint">Firma con el dedo · gira el teléfono</span>
+    <div class="sigbtns">
+      <button class="clear" id="sigClear">Borrar</button>
+      <button class="cancel" id="sigCancel">Cancelar</button>
+      <button class="save" id="sigSave">✓ Guardar</button>
+    </div>
   </div>
+  <canvas id="sigCanvas"></canvas>
 </div>
 
 <div id="ocrToast"><span class="spin"></span><span id="ocrMsg">Leyendo foto…</span></div>
