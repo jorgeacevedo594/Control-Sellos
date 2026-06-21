@@ -120,6 +120,17 @@
     background:#13294b;color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;opacity:0;
     transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
   #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* Picker cámara/galería */
+  .picker{position:fixed;inset:0;z-index:150;background:rgba(10,25,50,.5);display:none;align-items:flex-end;justify-content:center}
+  .picker.on{display:flex}
+  .picker-card{background:#fff;width:100%;max-width:440px;border-radius:20px 20px 0 0;padding:16px 16px max(16px,env(safe-area-inset-bottom));box-shadow:0 -6px 24px rgba(0,0,0,.22);animation:slideup .18s ease}
+  @keyframes slideup{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
+  .picker-title{font-weight:700;color:var(--esm-dark);font-size:15px;text-align:center;margin-bottom:14px}
+  .picker-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .picker-opt{border:1.5px solid var(--esm-line);background:var(--esm-soft);border-radius:14px;padding:18px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;color:var(--esm);font-weight:700;font-size:14px}
+  .picker-opt .pi{font-size:30px;line-height:1}
+  .picker-opt:active{background:#d8e6fa}
+  .picker-cancel{width:100%;margin-top:12px;border:none;background:#eef2f7;color:var(--muted);font-weight:600;font-size:14px;padding:12px;border-radius:11px;cursor:pointer}
   .pill{display:inline-block;background:var(--esm-soft);color:var(--esm);font-size:11px;font-weight:700;
     padding:2px 9px;border-radius:20px;margin-left:auto}
   .hidefile{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
@@ -264,9 +275,21 @@
 <div id="ocrToast"><span class="spin"></span><span id="ocrMsg">Leyendo foto…</span></div>
 <div id="toast"></div>
 
+<!-- Selector cámara / galería -->
+<div id="pickerModal" class="picker">
+  <div class="picker-card">
+    <div class="picker-title">Agregar foto</div>
+    <div class="picker-opts">
+      <button id="pickCam" class="picker-opt"><span class="pi">📷</span><span>Cámara</span></button>
+      <button id="pickGal" class="picker-opt"><span class="pi">🖼️</span><span>Galería</span></button>
+    </div>
+    <button id="pickCancel" class="picker-cancel">Cancelar</button>
+  </div>
+</div>
+
 <!-- hidden file inputs -->
-<input type="file" accept="image/*" capture="environment" id="fileOCR" class="hidefile">
-<input type="file" accept="image/*" capture="environment" id="filePhoto" class="hidefile">
+<input type="file" accept="image/*" id="fileOCR" class="hidefile">
+<input type="file" accept="image/*" id="filePhoto" class="hidefile">
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -358,7 +381,6 @@ function addISRow(){
       <div class="field" style="margin-bottom:8px"><label class="l">Realizada por</label><input data-is="realizada"></div>
       <div class="field" style="margin-bottom:8px"><label class="l">Fecha</label><input type="date" data-is="fecha"></div>
     </div>
-    <div class="field" style="margin-bottom:8px"><label class="l">Firma (nombre)</label><input data-is="firma"></div>
     <div class="field" style="margin:0"><label class="l">Observaciones</label><textarea data-is="obs"></textarea></div>`;
   d.querySelector('.del').onclick=()=>d.remove();
   $('#isList').appendChild(d);
@@ -372,8 +394,16 @@ document.body.addEventListener('click',e=>{
   const c=e.target.closest('.cam'); if(!c)return;
   if(c.dataset.ocr){ocrTarget={type:'id',key:c.dataset.ocr,label:c.dataset.label};}
   else if(c.dataset.ocrBf){ocrTarget={type:'bf',key:c.dataset.ocrBf,label:c.dataset.label};}
-  $('#fileOCR').value=''; $('#fileOCR').click();
+  openPicker($('#fileOCR'));
 });
+/* Selector cámara/galería */
+let pickerInput=null;
+function openPicker(input){pickerInput=input;$('#pickerModal').classList.add('on');}
+function closePicker(){$('#pickerModal').classList.remove('on');}
+$('#pickCam').onclick=()=>{if(pickerInput){pickerInput.value='';pickerInput.setAttribute('capture','environment');pickerInput.click();}closePicker();};
+$('#pickGal').onclick=()=>{if(pickerInput){pickerInput.value='';pickerInput.removeAttribute('capture');pickerInput.click();}closePicker();};
+$('#pickCancel').onclick=closePicker;
+$('#pickerModal').addEventListener('click',e=>{if(e.target.id==='pickerModal')closePicker();});
 $('#fileOCR').addEventListener('change',async e=>{
   const f=e.target.files[0]; if(!f||!ocrTarget)return;
   const data=await fileToStraightenedDataURL(f);
@@ -417,7 +447,7 @@ function setOCRValue(t,val){
 }
 
 /* ---------- Photo annex ---------- */
-$('#addPhoto').onclick=()=>{$('#filePhoto').value='';$('#filePhoto').click();};
+$('#addPhoto').onclick=()=>{openPicker($('#filePhoto'));};
 $('#filePhoto').addEventListener('change',async e=>{
   const f=e.target.files[0];if(!f)return;
   const data=await fileToStraightenedDataURL(f);
@@ -513,7 +543,7 @@ function collect(){
   const is=[];
   document.querySelectorAll('#isList .isrow').forEach(r=>{
     const g=k=>{const e=r.querySelector(`[data-is="${k}"]`);return e?e.value.trim():'';};
-    if(g('realizada')||g('obs')||g('firma')) is.push({realizada:g('realizada'),fecha:g('fecha'),firma:g('firma'),obs:g('obs')});
+    if(g('realizada')||g('obs')) is.push({realizada:g('realizada'),fecha:g('fecha'),obs:g('obs')});
   });
   return {
     grupo:gv('grupo'),punto:gv('punto'),fecha:gv('fecha'),
@@ -636,10 +666,18 @@ function buildPDF(D){
   txt('Firma',M+ic[0]+ic[1]+2,y+2.5,{b:1,s:6,c:[3,51,104]});txt('Observaciones',M+ic[0]+ic[1]+ic[2]+2,y+2.5,{b:1,s:6,c:[3,51,104]});
   y+=5;
   const isRows=Math.max(D.is.length,2);
-  for(let i=0;i<isRows;i++){const r=D.is[i]||{};const h=6.5;
+  for(let i=0;i<isRows;i++){const r=D.is[i]||{};const h=8;
     box(M,y,ic[0],h);txt(r.realizada,M+2,y+h/2,{s:7.5});
     box(M+ic[0],y,ic[1],h);txt(fmtDate(r.fecha),M+ic[0]+2,y+h/2,{s:7.5});
-    box(M+ic[0]+ic[1],y,ic[2],h);txt(r.firma,M+ic[0]+ic[1]+2,y+h/2,{s:7.5});
+    const fx=M+ic[0]+ic[1], fw=ic[2]; box(fx,y,fw,h);
+    if(i===0 && D.is.length>0 && state.firmaInspector){
+      try{
+        const pr=doc.getImageProperties(state.firmaInspector);
+        const maxW=fw-4, maxH=h-2; const sc=Math.min(maxW/pr.width, maxH/pr.height);
+        const iw=pr.width*sc, ih=pr.height*sc;
+        doc.addImage(state.firmaInspector,'PNG', fx+(fw-iw)/2, y+(h-ih)/2, iw, ih);
+      }catch(e){}
+    }
     box(M+ic[0]+ic[1]+ic[2],y,ic[3],h);txt(doc.splitTextToSize(r.obs||'',ic[3]-3),M+ic[0]+ic[1]+ic[2]+2,y+h/2,{s:7});
     y+=h;}
   y+=2;
