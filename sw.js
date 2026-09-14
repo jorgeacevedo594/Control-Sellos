@@ -1,5 +1,5 @@
 const PREFIX='esm-sellos-';
-const CACHE=PREFIX+'v1';
+const CACHE=PREFIX+'v2';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(
@@ -10,7 +10,7 @@ self.addEventListener('activate',e=>{e.waitUntil(
 self.addEventListener('fetch',e=>{
   const req=e.request; if(req.method!=='GET')return;
   const url=new URL(req.url);
-  const isLib=/jsdelivr|tessdata|unpkg|cdn/.test(url.host)||/tesseract|jspdf|traineddata|\.wasm/.test(url.pathname);
+  const isLib=/jsdelivr|unpkg|cdn/.test(url.host)||/jspdf/.test(url.pathname);
   if(isLib){
     e.respondWith(caches.open(CACHE).then(async c=>{
       const hit=await c.match(req); if(hit)return hit;

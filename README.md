@@ -1,12 +1,12 @@
 # ESM · Control de Sellos (PWA v1)
 
 App móvil instalable para inspectores: completa el certificado **F.01** (verificación de
-volúmenes / control de sellos), captura fotos con **OCR** para autocompletar sellos y placas,
+volúmenes / control de sellos), captura fotos de sellos y placas como evidencia (anexo del PDF),
 **firma con el dedo** a pantalla completa y **descarga el PDF** (con anexo de fotos en la 2.ª página).
 Funciona **online y offline**, en **Android e iOS**.
 
 ## Archivos
-- `index.html` — la app completa (formulario, OCR, firma, generación de PDF)
+- `index.html` — la app completa (formulario, fotos de evidencia, firma, generación de PDF)
 - `manifest.webmanifest` — para instalarla como app
 - `sw.js` — service worker (offline)
 - `icon-192.png`, `icon-512.png` — íconos
@@ -27,7 +27,7 @@ Abre `http://localhost:8080` en el teléfono (misma red) o en el navegador.
 Con el link en el teléfono: en Android (Chrome) "Agregar a pantalla de inicio"; en iOS (Safari) "Compartir → Agregar a inicio".
 
 ## Notas de la v1
-- **OCR:** Tesseract.js corre en el teléfono. La 1.ª lectura descarga la librería; luego queda en caché y funciona sin señal. Toca el botón 📷 junto a cada campo de sello/placa.
-- **Autoenderezado:** corrige orientación EXIF al cargar la foto. Todos los campos son editables si el OCR falla.
+- **Fotos por campo:** el botón 📷 junto a cada campo de sello/placa toma una foto y la guarda etiquetada en el anexo del PDF. El valor del campo se escribe a mano (el OCR se retiró en sep-2026 por baja fiabilidad con sellos grabados en metal).
+- **Orientación:** corrige la orientación EXIF al cargar la foto.
 - **Porcentaje:** se autocalcula como `(Lectura Medidor / Lectura Patrón) × 100`. (Confirmar fórmula).
 - **Sin compartir ni historial:** la app solo genera y descarga el PDF.
