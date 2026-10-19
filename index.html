@@ -210,7 +210,6 @@ table.sum td.n{font-weight:700;font-variant-numeric:tabular-nums}
 <header class="app">
   <div class="logo" data-act="go" data-to="#/home"><img src="img/logo-esm.png" alt="ESM"></div>
   <div class="ht">Control de Sellos<small id="hdrSub">Minera Centinela</small></div>
-  <button class="hchip" id="hdrMode" data-act="go" data-to="#/ajustes" style="display:none">Modo B</button>
   <button class="hchip" id="hdrRole" data-act="go" data-to="#/ajustes" style="display:none">JT</button>
 </header>
 <div class="demo-banner">PROTOTIPO · datos de ejemplo · lo que registres se guarda solo en este teléfono</div>
@@ -490,8 +489,7 @@ function route() {
 function updateHeader() {
   const u = S.user;
   $('#hdrRole').style.display = u ? '' : 'none';
-  $('#hdrMode').style.display = u ? '' : 'none';
-  if (u) { $('#hdrRole').textContent = ROLES[u.role].short; $('#hdrMode').textContent = 'Modo ' + S.mode; $('#hdrSub').textContent = u.name + ' · ' + ROLES[u.role].name; }
+  if (u) { $('#hdrRole').textContent = ROLES[u.role].short; $('#hdrSub').textContent = u.name + ' · ' + ROLES[u.role].name; }
   else $('#hdrSub').textContent = 'Minera Centinela';
 }
 const backBtn = (to, txt) => `<button class="back" data-act="go" data-to="${to}">‹ ${txt || 'Volver'}</button>`;
@@ -929,7 +927,7 @@ function vAjustes() {
   <div class="card"><div class="head">Datos de la demo</div><div class="body">
     <p class="small muted">Se guardan solo en este teléfono. Reiniciar borra lo registrado y vuelve a los ejemplos iniciales.</p>
     <button class="btn danger block" data-act="reset">Reiniciar demo</button></div></div>
-  <p class="small muted center">Prototipo v0.1 · ${FORM.code} v${FORM.version} · datos ${esc(D.version)}</p>`;
+  <p class="small muted center">Prototipo v0.2 · ${FORM.code} v${FORM.version} · datos ${esc(D.version)}</p>`;
 }
 
 /* ---------------- Modal y visor ---------------- */
